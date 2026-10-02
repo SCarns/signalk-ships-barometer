@@ -20,6 +20,13 @@ The assessment is **descriptive and experimental**. It does not provide a calibr
 
 ## Install
 
+Available on [npm](https://www.npmjs.com/package/signalk-ships-barometer). Refresh the Signal K store and search for **Ship's Barometer**, or install from your Signal K user directory:
+
+```sh
+cd ~/.signalk
+npm install --save signalk-ships-barometer
+```
+
 Download `signalk-ships-barometer-0.1.0.tgz` from [GitHub Releases](https://github.com/SCarns/signalk-ships-barometer/releases/latest) and copy it into your Signal K user directory, normally `~/.signalk`:
 
 ```sh
@@ -31,7 +38,7 @@ npm install --save ./signalk-ships-barometer-0.1.0.tgz
 
 Restart Signal K and enable **Ship's Barometer** in plugin settings. To use the extra assessment, enable **Local weather assessment**. Check [installation and migration](docs/installation.md) for source/depth settings and history handling.
 
-This release is distributed on GitHub. See [publishing to the Signal K store](docs/publishing.md). npm/store availability is a separate publishing step; do not assume `npm install signalk-ships-barometer` or store search will work until it has been published there.
+Version 0.1.0 is published on npm under **scarns**, with the Signal K discovery keyword and app icon metadata. Store indexing/cache refresh may take time. See [publishing to the Signal K store](docs/publishing.md) for future releases.
 
 ## Local inputs and output
 

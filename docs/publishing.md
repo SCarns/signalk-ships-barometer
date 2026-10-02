@@ -2,7 +2,7 @@
 
 Signal K discovers plugins published to npm with the `signalk-node-server-plugin` keyword. Ship's Barometer already has that keyword, the weather category, its own package name (`signalk-ships-barometer`), display name and app icon metadata. GitHub publication alone does not make it available in the store.
 
-The first release tarball is ready for npm publication. It installed offline and passed all 64 tests against the installed artifact. Its publish dry run succeeded. The development machine is not currently authenticated to npm; actual publication was not attempted with missing credentials.
+Version **0.1.0 was published successfully on October 2, 2026 under scarns**. The public registry reports it as latest; its checksum matches the tested GitHub release tarball. Signal K discovery keywords and icon metadata were verified. The installed artifact passed all 64 tests. The initial authentication setup below is retained as a reference for future publishers.
 
 ## First publication
 
