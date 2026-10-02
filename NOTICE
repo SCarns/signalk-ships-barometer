@@ -1,0 +1,14 @@
+Ship's Barometer
+
+This project derives from signalk-barometer-trend v2.3.4 by oyve.
+Original project: https://github.com/oyve/signalk-barometer-trend
+The barometer-trend forecasting library is also by oyve:
+https://github.com/oyve/barometer-trend
+Original Apache License 2.0 terms and notices are retained in LICENSE.
+
+Modifications maintained by SCarns (2026): corrected wind-angle units and saved-history migration; optional offline local assessment; source/timestamp/quality checks; water-temperature context; independent packaging, documentation and tests.
+This independent project is not endorsed by the original author.
+
+The nautical barometer artwork was generated with OpenAI image generation at SCarns' direction and is included under this project's Apache-2.0 distribution terms.
+Bundled dependencies retain their own license notices in their packages.
+Modified JSON configuration/metadata/package files and modified tests are identified in CHANGELOG.md.

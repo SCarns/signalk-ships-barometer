@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('assert'),{Assessment,PATHS}=require('../assessment');
+const now=Date.UTC(2026,9,2,15);
+function put(a,key,value,time=now,source='local'){a.ingest({updates:[{timestamp:new Date(time).toISOString(),$source:source,values:[{path:PATHS[key],value}]}]},now);}
+function air(){const a=new Assessment({}, .6096);put(a,'temperature',293.15);put(a,'humidity',.8);return a;}
+describe('Water-temperature context and moisture agreement',()=>{
+ it('identifies cooling potential using local water and dew point',()=>{const a=air();put(a,'water',288.15);const r=a.evaluate(now);assert.equal(r.waterContext,'air_warmer_than_water');assert.equal(r.fogContext,'cooling_to_saturation_possible');assert.equal(r.waterMeasurement.depthM,.6096);assert.equal(r.waterMeasurement.surfaceTemperatureMeasured,false);assert.equal(r.measurements.airWaterTemperatureDifference,5);assert.equal(r.units.airWaterTemperatureDifference,'K');});
+ it('distinguishes warmer water without inventing a wind forecast',()=>{const a=air();put(a,'water',298.15);const r=a.evaluate(now);assert.equal(r.waterContext,'water_warmer_than_air');assert.equal(r.fogContext,'cooling_to_saturation_not_indicated');assert.equal(r.windOutlook,'uncalibrated');});
+ it('leaves absent and stale water unknown',()=>{const a=air();assert.equal(a.evaluate(now).waterContext,'unknown');put(a,'water',288.15);assert.equal(a.evaluate(now+31*60000).waterContext,'unknown');});
+ it('flags screenshot-like disagreement instead of issuing moisture/fog context',()=>{const a=new Assessment();put(a,'temperature',(69-32)*5/9+273.15);put(a,'humidity',.83);put(a,'dewpoint',(51-32)*5/9+273.15);put(a,'water',288.15);const r=a.evaluate(now);assert(r.qualityFlags.includes('dewpoint_humidity_disagreement'));assert.equal(r.moistureState,'unknown');assert.equal(r.fogContext,'unknown');assert.equal(r.measurements.dewpoint,null);});
+ it('flags unsynchronized temperature/humidity observations',()=>{const a=new Assessment();put(a,'temperature',293.15);put(a,'humidity',.8,now-3*60000);assert(a.evaluate(now).qualityFlags.includes('temperature_humidity_time_mismatch'));assert.equal(a.evaluate(now).moistureState,'unknown');});
+ it('flags dew point above air temperature',()=>{const a=air();put(a,'dewpoint',295.15);assert(a.evaluate(now).qualityFlags.includes('dewpoint_above_air_temperature'));});
+ it('retains consistent supplied dew point',()=>{const a=air();put(a,'dewpoint',289.6);assert.equal(a.evaluate(now).dewpointMethod,'supplied');assert.deepEqual(a.evaluate(now).qualityFlags,[]);});
+ it('enforces configured water source and excludes modeled water',()=>{const a=new Assessment({water:'can0.32'});put(a,'water',288.15,now,'other');assert(!a.latest.water);put(a,'water',288.15,now,'can0.32');assert.equal(a.latest.water.source,'can0.32');const b=new Assessment();put(b,'water',288.15,now,'open-meteo');assert(!b.latest.water);});
+ it('rejects invalid water values and restores valid water without refreshing its time',()=>{const a=air();put(a,'water',999);assert(!a.latest.water);put(a,'water',288.15);const b=new Assessment();b.restore(a.save(),now+60000);assert.equal(b.latest.water.time,now);assert.equal(b.evaluate(now+60000).fogContext,'cooling_to_saturation_possible');});
+});

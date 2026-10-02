@@ -1,0 +1,68 @@
+[
+  {
+    "type": "object",
+    "properties": {
+      "rate": {
+        "title": "Pressure Sample Rate (s)",
+        "description": "Example: 60, 600, 1200 (1, 10, 20 minutes). Min: 60 (default), Max = 1200",
+        "type": "number",
+        "default": 60
+      },
+      "altitude": {
+        "title": "Altitude offset (m)",
+        "description": "Sensor altitude offset to GPS altitude or default zero",
+        "type": "number",
+        "default": 0
+      },
+      "localAssessment": {
+        "title": "Enable local weather assessment",
+        "description": "Optional offline observations with pressure, wind and moisture evidence. Publishes an additional structured assessment; existing forecasts stay unchanged.",
+        "type": "boolean",
+        "default": false
+      },
+      "assessmentPressureSource": {
+        "title": "Local assessment: pressure source",
+        "type": "string",
+        "default": "",
+        "description": "Exact local Signal K source ID. Blank retains the first valid local source; set explicitly when multiple sources share a path."
+      },
+      "assessmentWindSource": {
+        "title": "Local assessment: wind source",
+        "type": "string",
+        "default": "",
+        "description": "Exact local Signal K source ID. Blank retains the first valid local source; set explicitly when multiple sources share a path."
+      },
+      "assessmentTemperatureSource": {
+        "title": "Local assessment: temperature source",
+        "type": "string",
+        "default": "",
+        "description": "Exact local Signal K source ID. Blank retains the first valid local source; set explicitly when multiple sources share a path."
+      },
+      "assessmentHumiditySource": {
+        "title": "Local assessment: humidity source",
+        "type": "string",
+        "default": "",
+        "description": "Exact local Signal K source ID. Blank retains the first valid local source; set explicitly when multiple sources share a path."
+      },
+      "assessmentDewpointSource": {
+        "title": "Local assessment: dewpoint source",
+        "type": "string",
+        "default": "",
+        "description": "Exact local Signal K source ID. Blank retains the first valid local source; set explicitly when multiple sources share a path."
+      },
+      "assessmentWaterSource": {
+        "title": "Local assessment: water temperature source",
+        "type": "string",
+        "default": "",
+        "description": "Exact local Signal K source ID. Blank retains the first valid local source; set explicitly when multiple sources share a path."
+      },
+      "assessmentWaterDepthM": {
+        "title": "Local assessment: water sensor depth (m)",
+        "type": "number",
+        "minimum": 0,
+        "description": "Optional depth below the surface. Leave unset if unknown. For a transducer two feet deep, enter 0.6096."
+      }
+    },
+    "$comment": "Modified by SCarns for independent Ship's Barometer settings; see NOTICE and CHANGELOG.md."
+  }
+]

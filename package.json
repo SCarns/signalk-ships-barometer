@@ -1,0 +1,76 @@
+{
+  "name": "signalk-ships-barometer",
+  "version": "0.1.0",
+  "description": "Ship's Barometer: offline pressure forecasts and local wind, moisture and water-temperature assessment",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SCarns/signalk-ships-barometer.git"
+  },
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk-plugin",
+    "signalk-category-weather",
+    "signalk",
+    "barometer",
+    "pressure",
+    "trend",
+    "tendency",
+    "front",
+    "hemisphere",
+    "prediction",
+    "weather",
+    "forecast"
+  ],
+  "author": "SCarns",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/SCarns/signalk-ships-barometer/issues"
+  },
+  "homepage": "https://github.com/SCarns/signalk-ships-barometer#readme",
+  "dependencies": {
+    "barometer-trend": "2.2.7",
+    "lodash": "^4.17.21",
+    "regression": "^2.0.1"
+  },
+  "devDependencies": {
+    "mocha": "^10.1.0"
+  },
+  "bundleDependencies": [
+    "barometer-trend",
+    "lodash",
+    "regression"
+  ],
+  "contributors": [
+    {
+      "name": "oyve",
+      "url": "https://github.com/oyve"
+    }
+  ],
+  "signalk-plugin-enabled-by-default": false,
+  "signalk": {
+    "appIcon": "./assets/ships-barometer.png",
+    "displayName": "Ship's Barometer"
+  },
+  "files": [
+    "index.js",
+    "barometer.js",
+    "map.js",
+    "assessment.js",
+    "schema.json",
+    "meta.json",
+    "assets",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "CHANGELOG.md",
+    "docs"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "_comment": "Independent modifications by SCarns, 2026; derived from oyve/signalk-barometer-trend v2.3.4. See NOTICE and CHANGELOG.md."
+}
