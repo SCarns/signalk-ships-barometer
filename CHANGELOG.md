@@ -2,6 +2,8 @@
 
 ## 0.3.0
 
+- Show wind-direction, pressure-only and seasonal forecasts separately using their existing published fields; distinguish measured conditions from forecasts without changing calculations.
+
 - Add an optional, default-off pressure comparison using only Signal K’s existing default Weather API provider. No new service, account, dependency or provider registration.
 - Draw saved forecasts as a solid underlay and current future forecasts as a dotted line, with Now, provenance and issue times. Preserve boat observations in front.
 - Require verifiable per-record issue times, recent position and fresh forecasts; omit unavailable/stale future data. Standard Weather API does not guarantee the required optional issuedAt metadata.

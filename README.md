@@ -5,7 +5,10 @@ InfluxDB, internet connection, API key or extra history plugin is required.
 
 Open **Ship’s Barometer** from Signal K’s Webapps after enabling the plugin. The
 webapp shows current sensor pressure in hPa, a measured three-hour change, the
-existing tendency and plain-language pressure forecast. Select 6, 12, 24 or 48 hours.
+existing tendency and three clearly labeled forecasts: wind-direction, pressure-only
+and seasonal outlook. Measured conditions appear separately underneath when enabled.
+These are the same published Signal K values available to other displays.
+Select 6, 12, 24 or 48 hours.
 Day, Night and Red use the same controls and Auto rules as Endurance: the theme
 button cycles the manual modes, and Auto follows vessel `environment.mode`.
 Day selects Day; Night selects Red while `navigation.state` is sailing or motoring,

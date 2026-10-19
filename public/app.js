@@ -73,7 +73,7 @@ function showComparison(comparison) {
   el('forecast-provenance').textContent=points.length?`${providers} · latest displayed issue ${new Date(newest).toLocaleString()}. Historical points keep their original issue times (inspect points). ${comparison.reference} Saved forecasts are comparison only.`:'';
   if(comparison?.storageError)el('forecast-status').textContent+=' Forecast comparison storage needs attention.';
 }
-function clearReadings() { for (const id of ['pressure','change','tendency']) el(id).textContent='—'; el('assessment').textContent='Waiting for fresh Barometer analysis.';el('local').textContent=''; }
+function clearReadings() { for (const id of ['pressure','change','tendency']) el(id).textContent='—'; for (const id of ['assessment','pressure-forecast','season-forecast']) el(id).textContent='Waiting for fresh Barometer analysis.';el('local').textContent='';el('local-observations').hidden=true; }
 async function refresh() {
   const seq=++request;
   try {
@@ -92,9 +92,14 @@ async function refresh() {
     const read=path=>{const v=data.analysis[path];return v&&h.fresh&&h.now-v.time<=5*60000?v.value:null;};
     const prefix='environment.outside.pressure.';
     el('tendency').textContent=read(prefix+'trend.tendency') || '—';
-    el('assessment').textContent=read(prefix+'prediction.quadrant') || read(prefix+'prediction.pressureOnly') || 'Waiting for existing Barometer analysis.';
+    for (const [id, field] of [['assessment','quadrant'],['pressure-forecast','pressureOnly'],['season-forecast','season']]) {
+      el(id).textContent=read(prefix+'prediction.'+field) || 'Waiting for fresh Barometer analysis.';
+    }
     const local=read('environment.outside.weather.assessment');
-    if(local&&Array.isArray(local.reasons))el('local').textContent=local.reasons.join(' ');
+    if(local&&Array.isArray(local.reasons)&&local.reasons.length) {
+      el('local').textContent=local.reasons.join(' ');
+      el('local-observations').hidden=false;
+    }
     el('source').textContent=`Pressure source: ${h.source||'waiting'} · 3-hour change needs an observed sample within one minute of the baseline.`;
     showComparison(data.comparison);
     chart(h,data.comparison);
