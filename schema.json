@@ -67,12 +67,6 @@
         "type": "string",
         "default": "",
         "description": "Exact Signal K source ID for the chart. Blank locks to the first valid local pressure source and retains it across restarts. Independent of forecast inputs."
-      },
-      "forecastComparison": {
-        "title": "Show Weather API forecast comparison",
-        "type": "boolean",
-        "default": false,
-        "description": "Optional display only. Uses the existing Signal K default Weather API provider; no account or service is added. Requires pressure forecasts with verifiable issuedAt metadata. Missing, stale or unavailable forecasts are omitted. Boat observations and analysis remain authoritative."
       }
     },
     "$comment": "Modified by SCarns for independent Ship's Barometer settings; see NOTICE and CHANGELOG.md."

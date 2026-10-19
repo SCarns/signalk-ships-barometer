@@ -2,7 +2,6 @@
 'use strict'
 const fs = require('fs');
 const { History } = require('./lib/history');
-const { ForecastComparison } = require('./lib/forecast-comparison');
 const meta = require('./meta.json');
 const schema = require('./schema.json');
 const barometer = require('./barometer');
@@ -12,8 +11,6 @@ module.exports = function (app) {
     var plugin = { };
     let persistTimer = null;
     let history = null;
-    let comparison = null;
-    let comparisonTimer = null;
     let running = false;
     let display = {};
     let assessment = null;
@@ -30,12 +27,6 @@ module.exports = function (app) {
         history = new History(app.getDataDirPath() + '/pressure-history.json', app.selfId, msg => app.error(msg), options.historyPressureSource || '');
         history.load();
         running = true;
-        comparison = new ForecastComparison(app, app.getDataDirPath() + '/forecast-comparison.json', options.forecastComparison === true);
-        comparison.load();
-        if (options.forecastComparison === true) {
-            comparison.refresh();
-            comparisonTimer = setInterval(() => comparison && comparison.refresh(), 15 * 60000);
-        }
 
         try {
             barometer.setSampleRate(options.rate);
@@ -94,7 +85,6 @@ module.exports = function (app) {
         persistTimer = setInterval(function () {
             saveAssessment();
             if (history) history.save();
-            if (comparison) comparison.save();
             barometer.persist(write);
         }, 1000 * 60 * 3); //every 3 minutes        
     };
@@ -102,10 +92,6 @@ module.exports = function (app) {
     plugin.stop = function () {
         app.debug('Plugin stopping');
         running = false;
-        clearInterval(comparisonTimer);
-        comparisonTimer = null;
-        if (comparison) comparison.stop();
-        comparison = null;
         if (history) history.save();
         history = null;
         display = {};
@@ -133,7 +119,7 @@ module.exports = function (app) {
                 const value = leaf && leaf.value !== undefined ? leaf.value : leaf;
                 return typeof value === 'string' ? value : null;
             };
-            res.json({ running, history: history ? history.snapshot(hours) : null, analysis: display, comparison: comparison ? comparison.snapshot(hours) : null,
+            res.json({ running, history: history ? history.snapshot(hours) : null, analysis: display,
                 display: { environmentMode: modeValue('environment.mode'), navigationState: modeValue('navigation.state') } });
         });
     };
