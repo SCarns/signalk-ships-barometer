@@ -2,6 +2,8 @@
 
 ## 0.3.0 (unpublished)
 
+- Add frontal outlook and expected wind behavior from existing published analysis, with the same freshness checks as other forecasts.
+
 - Show wind-direction, pressure-only and seasonal forecasts separately using their existing published fields; distinguish measured conditions from forecasts without changing calculations.
 - Remove the experimental Weather API comparison. No external forecast requests, comparison storage or provider settings remain in this build.
 

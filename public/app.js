@@ -42,7 +42,7 @@ function chart(h) {
     }
   }
 }
-function clearReadings() { for (const id of ['pressure','change','tendency']) el(id).textContent='—'; for (const id of ['assessment','pressure-forecast','season-forecast']) el(id).textContent='Waiting for fresh Barometer analysis.';el('local').textContent='';el('local-observations').hidden=true; }
+function clearReadings() { for (const id of ['pressure','change','tendency']) el(id).textContent='—'; for (const id of ['assessment','pressure-forecast','season-forecast','front-outlook','front-wind']) el(id).textContent='Waiting for fresh Barometer analysis.';el('local').textContent='';el('local-observations').hidden=true; }
 async function refresh() {
   const seq=++request;
   try {
@@ -61,7 +61,7 @@ async function refresh() {
     const read=path=>{const v=data.analysis[path];return v&&h.fresh&&h.now-v.time<=5*60000?v.value:null;};
     const prefix='environment.outside.pressure.';
     el('tendency').textContent=read(prefix+'trend.tendency') || '—';
-    for (const [id, field] of [['assessment','quadrant'],['pressure-forecast','pressureOnly'],['season-forecast','season']]) {
+    for (const [id, field] of [['assessment','quadrant'],['pressure-forecast','pressureOnly'],['season-forecast','season'],['front-outlook','front.prognose'],['front-wind','front.wind']]) {
       el(id).textContent=read(prefix+'prediction.'+field) || 'Waiting for fresh Barometer analysis.';
     }
     const local=read('environment.outside.weather.assessment');
