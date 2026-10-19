@@ -1,5 +1,13 @@
 # Changes
 
+## 0.3.0
+
+- Add an optional, default-off pressure comparison using only Signal K’s existing default Weather API provider. No new service, account, dependency or provider registration.
+- Draw saved forecasts as a solid underlay and current future forecasts as a dotted line, with Now, provenance and issue times. Preserve boat observations in front.
+- Require verifiable per-record issue times, recent position and fresh forecasts; omit unavailable/stale future data. Standard Weather API does not guarantee the required optional issuedAt metadata.
+- Freeze original forecasts before their valid time, retain a bounded separate archive, and never backfill or revise historical predictions.
+- Preserve onboard pressure, tendency, assessment and forecast calculations unchanged. Add comparison lifecycle, persistence, chart and isolation tests.
+
 ## 0.2.0
 
 - Add an independent, minute-bounded pressure recorder with at most 72 hours / 4,320 samples, atomic persistence and automatic expiration.

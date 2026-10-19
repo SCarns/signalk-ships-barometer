@@ -1,4 +1,4 @@
-# Ship’s Barometer 0.2.0
+# Ship’s Barometer 0.3.0
 
 An offline Signal K weather instrument with a responsive pressure chart. No QuestDB,
 InfluxDB, internet connection, API key or extra history plugin is required.
@@ -11,6 +11,44 @@ button cycles the manual modes, and Auto follows vessel `environment.mode`.
 Day selects Day; Night selects Red while `navigation.state` is sailing or motoring,
 and Night while anchored or moored. Missing day/night state falls back to Night.
 Your manual selection is stored in your browser.
+
+If your Signal K weather provider supplies fresh pressure forecasts with an issue
+time, you can also compare the weatherman’s prediction with what the boat actually
+measured. Turn on **Show Weather API forecast comparison** in plugin settings.
+The boat remains the authority; this optional comparison never changes its analysis.
+
+## Optional weather comparison
+
+No weather account, API key or new service is added. This uses only the default
+provider already available through Signal K’s Weather API. It is **off by default**.
+
+- Boat observations stay in front. A solid forecast underlay shows predictions saved
+  before their forecast time arrived; a dotted line shows the latest available future
+  forecast, up to 24 hours ahead. A Now divider separates past and future.
+- Historical comparison starts collecting when enabled. It never invents earlier
+  predictions or replaces them with revised forecasts or later observations.
+- Hover over forecast points for valid, issued and received times and the provider
+  label, where supplied. Otherwise the label identifies Signal K’s default provider.
+- Fresh forecasts must have been issued within six hours. A fresh vessel position
+  (within five minutes) is required, and comparison points must be within 20 km of
+  that position. Forecasts are checked every 15 minutes.
+- If the provider or connection is unavailable, or issue timing cannot be verified,
+  future forecasts are omitted. Previously saved historical comparisons can remain.
+  The boat’s own instrument continues working offline.
+- Forecast pressure may use a different reference from raw sensor pressure. Values
+  are displayed as supplied, without altitude correction or artificial alignment.
+- Comparison storage is separate: at most 120 points per collection, covering no more
+  than 72 past hours and 48 future hours, at most one supplied point per valid hour
+  for each provider/location. No external database is needed. Changed data is saved
+  every three minutes and at orderly shutdown.
+
+**Provider compatibility:** the Weather API standard supplies forecast valid times
+and optional pressure, but does not guarantee an issue time. This version requires
+an explicit ISO `issuedAt` field on each forecast record; receiving a forecast now
+is not proof it was issued recently. Providers without that metadata are safely
+skipped, with an explanation in the webapp. A Weather API compliant provider alone
+does not guarantee compatibility. We do not create or configure a provider for you.
+See [the comparison contract](docs/forecast-comparison.md).
 
 ## History and data quality
 
@@ -39,20 +77,20 @@ Your manual selection is stored in your browser.
 
 The existing pressure/tendency/forecast calculation files are unchanged. The optional
 local weather assessment remains opt-in. Its existing explanatory reasons appear
-when enabled and fresh. External forecast overlays are not included in this release:
-no suitable provider was already integrated, and this instrument works entirely offline.
+when enabled and fresh. Weather API comparisons are display-only and independent
+of both the onboard history recorder and the existing analysis.
 
 ## Install, update and rollback
 
 For the local release tarball, in the Signal K installation directory (commonly
-`~/.signalk`), run `npm install /absolute/path/signalk-ships-barometer-0.2.0.tgz`.
+`~/.signalk`), run `npm install /absolute/path/signalk-ships-barometer-0.3.0.tgz`.
 Restart Signal K, enable Ship’s Barometer in Plugin Config, then open its Webapp.
 For containers, use the installation directory inside the Signal K container and
 retain the persistent Signal K data volume. This is local installation guidance;
 initial onboard review on TBD confirms live observations and historical collection. Forecast accuracy has not been field-calibrated.
 
 Before updating, back up the plugin configuration and its data directory. To roll
-back, reinstall `signalk-ships-barometer@0.1.0` (or your saved previous tarball) and
+back, reinstall `signalk-ships-barometer@0.2.0` (or your saved previous tarball) and
 restart Signal K. The new history file is independent of legacy `offline.json` and
 `local-assessment.json`. Keep the backup until your aboard checks pass.
 
@@ -61,6 +99,8 @@ restart Signal K. The new history file is independent of legacy `offline.json` a
 Run `npm ci` then `npm test`. Tests cover retention, minute bounds, original timestamps,
 source isolation, persistence/restart, corrupt storage, write failures, chart gaps,
 endpoint validation and plugin lifecycle, alongside the inherited forecast tests.
+Comparison tests also cover issue-time validation, stale/offline behavior, bounded
+archives, restart, chart ordering and isolation from onboard analysis.
 The read-only `/plugins/signalk-ships-barometer/history?hours=24` endpoint accepts
 only 6, 12, 24 and 48 hours. Browser assets ship locally with the package.
 
@@ -95,11 +135,11 @@ cd ~/.signalk
 npm install --save signalk-ships-barometer
 ```
 
-Download `signalk-ships-barometer-0.2.0.tgz` from [GitHub Releases](https://github.com/SCarns/signalk-ships-barometer/releases/latest) and copy it into your Signal K user directory, normally `~/.signalk`:
+Download `signalk-ships-barometer-0.3.0.tgz` from [GitHub Releases](https://github.com/SCarns/signalk-ships-barometer/releases/latest) and copy it into your Signal K user directory, normally `~/.signalk`:
 
 ```sh
 cd ~/.signalk
-npm install --save ./signalk-ships-barometer-0.2.0.tgz
+npm install --save ./signalk-ships-barometer-0.3.0.tgz
 ```
 
 **Disable Barometer Trend before enabling Ship's Barometer.** The plugins share the original forecast output paths; running both would create competing publishers. You can keep the old package installed for rollback.

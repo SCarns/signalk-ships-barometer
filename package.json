@@ -1,6 +1,6 @@
 {
   "name": "signalk-ships-barometer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Ship's Barometer: offline pressure forecasts and local wind, moisture and water-temperature assessment",
   "main": "index.js",
   "scripts": {
