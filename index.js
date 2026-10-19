@@ -1,6 +1,7 @@
 // Ship's Barometer modifications by SCarns, 2026. Derived from oyve/signalk-barometer-trend v2.3.4; see NOTICE and CHANGELOG.md.
 'use strict'
 const fs = require('fs');
+const { History } = require('./lib/history');
 const meta = require('./meta.json');
 const schema = require('./schema.json');
 const barometer = require('./barometer');
@@ -9,6 +10,9 @@ const { Assessment, PATHS } = require('./assessment');
 module.exports = function (app) {
     var plugin = { };
     let persistTimer = null;
+    let history = null;
+    let running = false;
+    let display = {};
     let assessment = null;
     let assessmentTimer = null;
 
@@ -19,6 +23,10 @@ module.exports = function (app) {
     var unsubscribes = [];
     plugin.start = function (options, restartPlugin) {
         app.debug('Plugin started');
+        display = {};
+        history = new History(app.getDataDirPath() + '/pressure-history.json', app.selfId, msg => app.error(msg), options.historyPressureSource || '');
+        history.load();
+        running = true;
 
         try {
             barometer.setSampleRate(options.rate);
@@ -68,14 +76,25 @@ module.exports = function (app) {
             publishAssessment();
         }
 
+        app.subscriptionmanager.subscribe(
+            { context: 'vessels.' + app.selfId, subscribe: [{ path: 'environment.outside.pressure', period: 60000, policy: 'instant', minPeriod: 60000 }] },
+            unsubscribes, err => app.error('Pressure history subscription: ' + err),
+            delta => history && history.ingest(delta)
+        );
+
         persistTimer = setInterval(function () {
             saveAssessment();
+            if (history) history.save();
             barometer.persist(write);
         }, 1000 * 60 * 3); //every 3 minutes        
     };
 
     plugin.stop = function () {
         app.debug('Plugin stopping');
+        running = false;
+        if (history) history.save();
+        history = null;
+        display = {};
         clearInterval(persistTimer);
         clearInterval(assessmentTimer);
         saveAssessment();
@@ -89,7 +108,27 @@ module.exports = function (app) {
 
     plugin.schema = schema[0];
 
+    plugin.registerWithRouter = function (router) {
+        const viewer = typeof router.access === 'function' ? router.access('readonly') : router;
+        viewer.get('/history', (req, res) => {
+            const hours = Number(req.query && req.query.hours || 24);
+            if (![6, 12, 24, 48].includes(hours)) return res.status(400).json({ error: 'Choose 6, 12, 24 or 48 hours' });
+            res.set('Cache-Control', 'no-store');
+            const modeValue = path => {
+                const leaf = app.getSelfPath && app.getSelfPath(path);
+                const value = leaf && leaf.value !== undefined ? leaf.value : leaf;
+                return typeof value === 'string' ? value : null;
+            };
+            res.json({ running, history: history ? history.snapshot(hours) : null, analysis: display,
+                display: { environmentMode: modeValue('environment.mode'), navigationState: modeValue('navigation.state') } });
+        });
+    };
+
     function sendDelta(deltaValues) {
+        if (Array.isArray(deltaValues)) {
+            const time = Date.now();
+            for (const v of deltaValues) display[v.path] = { value: v.value, time };
+        }
         if (deltaValues !== null && deltaValues.length > 0) {
             let signalk_delta = {
                 context: "vessels." + app.selfId,

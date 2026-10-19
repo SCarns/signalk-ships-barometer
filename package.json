@@ -1,6 +1,6 @@
 {
   "name": "signalk-ships-barometer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Ship's Barometer: offline pressure forecasts and local wind, moisture and water-temperature assessment",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,8 @@
     "hemisphere",
     "prediction",
     "weather",
-    "forecast"
+    "forecast",
+    "signalk-webapp"
   ],
   "author": "SCarns",
   "license": "Apache-2.0",
@@ -52,7 +53,7 @@
   ],
   "signalk-plugin-enabled-by-default": false,
   "signalk": {
-    "appIcon": "./assets/ships-barometer.png",
+    "appIcon": "assets/ships-barometer.png",
     "displayName": "Ship's Barometer"
   },
   "files": [
@@ -67,7 +68,9 @@
     "NOTICE",
     "README.md",
     "CHANGELOG.md",
-    "docs"
+    "docs",
+    "lib",
+    "public"
   ],
   "engines": {
     "node": ">=18"

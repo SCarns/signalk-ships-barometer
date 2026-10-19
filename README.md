@@ -1,3 +1,71 @@
+# Ship’s Barometer 0.2.0
+
+An offline Signal K weather instrument with a responsive pressure chart. No QuestDB,
+InfluxDB, internet connection, API key or extra history plugin is required.
+
+Open **Ship’s Barometer** from Signal K’s Webapps after enabling the plugin. The
+webapp shows current sensor pressure in hPa, a measured three-hour change, the
+existing tendency and plain-language pressure forecast. Select 6, 12, 24 or 48 hours.
+Day, Night and Red use the same controls and Auto rules as Endurance: the theme
+button cycles the manual modes, and Auto follows vessel `environment.mode`.
+Day selects Day; Night selects Red while `navigation.state` is sailing or motoring,
+and Night while anchored or moored. Missing day/night state falls back to Night.
+Your manual selection is stored in your browser.
+
+## History and data quality
+
+- A separate recorder retains at most **72 hours (3 days)** and **4,320 samples**.
+- At most one actual observation per 60 seconds; no timer-generated samples.
+- Original Signal K timestamps are retained, including across restarts. Invalid,
+  future, out-of-order and other-vessel observations are rejected. Source IDs are
+  required; known external weather sources are excluded.
+- The recorder locks to the first accepted pressure source. Use **History pressure
+  source** to select an exact Signal K source ID when multiple sources exist. The
+  chart’s source selection is independent of the legacy forecast engine.
+- Lines stop at gaps longer than 90 seconds. Single observations remain visible as
+  points. Missing observations are never filled. No history is imported from the
+  forecast engine or an external database.
+- The three-hour delta compares actual readings within one minute of the three-hour
+  baseline; it is unavailable without that baseline or with stale current data.
+  It describes the change between those observations, even if there are gaps between them.
+- Current pressure and analysis are hidden when pressure observations are over five
+  minutes old. Historical points remain available, with their actual times.
+- `pressure-history.json` in the plugin data directory is atomically replaced every
+  three minutes when changed, and on orderly shutdown. Expired observations are
+  pruned during ingestion, reads, loading and saves. An abrupt power loss may lose
+  the latest three minutes. History storage errors appear in the webapp and server log.
+- The chart displays raw sensor pressure. The existing analysis retains its own
+  altitude correction, sampling and source handling, so its reference can differ.
+
+The existing pressure/tendency/forecast calculation files are unchanged. The optional
+local weather assessment remains opt-in. Its existing explanatory reasons appear
+when enabled and fresh. External forecast overlays are not included in this release:
+no suitable provider was already integrated, and this instrument works entirely offline.
+
+## Install, update and rollback
+
+For the local release tarball, in the Signal K installation directory (commonly
+`~/.signalk`), run `npm install /absolute/path/signalk-ships-barometer-0.2.0.tgz`.
+Restart Signal K, enable Ship’s Barometer in Plugin Config, then open its Webapp.
+For containers, use the installation directory inside the Signal K container and
+retain the persistent Signal K data volume. This is local installation guidance;
+initial onboard review on TBD confirms live observations and historical collection. Forecast accuracy has not been field-calibrated.
+
+Before updating, back up the plugin configuration and its data directory. To roll
+back, reinstall `signalk-ships-barometer@0.1.0` (or your saved previous tarball) and
+restart Signal K. The new history file is independent of legacy `offline.json` and
+`local-assessment.json`. Keep the backup until your aboard checks pass.
+
+## Development
+
+Run `npm ci` then `npm test`. Tests cover retention, minute bounds, original timestamps,
+source isolation, persistence/restart, corrupt storage, write failures, chart gaps,
+endpoint validation and plugin lifecycle, alongside the inherited forecast tests.
+The read-only `/plugins/signalk-ships-barometer/history?hours=24` endpoint accepts
+only 6, 12, 24 and 48 hours. Browser assets ship locally with the package.
+
+---
+
 <!-- Independent modifications by SCarns, 2026. Derived from oyve/signalk-barometer-trend v2.3.4; see NOTICE. -->
 # Ship's Barometer
 
@@ -27,18 +95,18 @@ cd ~/.signalk
 npm install --save signalk-ships-barometer
 ```
 
-Download `signalk-ships-barometer-0.1.0.tgz` from [GitHub Releases](https://github.com/SCarns/signalk-ships-barometer/releases/latest) and copy it into your Signal K user directory, normally `~/.signalk`:
+Download `signalk-ships-barometer-0.2.0.tgz` from [GitHub Releases](https://github.com/SCarns/signalk-ships-barometer/releases/latest) and copy it into your Signal K user directory, normally `~/.signalk`:
 
 ```sh
 cd ~/.signalk
-npm install --save ./signalk-ships-barometer-0.1.0.tgz
+npm install --save ./signalk-ships-barometer-0.2.0.tgz
 ```
 
 **Disable Barometer Trend before enabling Ship's Barometer.** The plugins share the original forecast output paths; running both would create competing publishers. You can keep the old package installed for rollback.
 
 Restart Signal K and enable **Ship's Barometer** in plugin settings. To use the extra assessment, enable **Local weather assessment**. Check [installation and migration](docs/installation.md) for source/depth settings and history handling.
 
-Version 0.1.0 is published on npm under **scarns**, with the Signal K discovery keyword and app icon metadata. Store indexing/cache refresh may take time. See [publishing to the Signal K store](docs/publishing.md) for future releases.
+Releases are published on npm under **scarns**, with the Signal K discovery keyword and app icon metadata. Store indexing/cache refresh may take time. See [publishing to the Signal K store](docs/publishing.md) for future releases.
 
 ## Local inputs and output
 

@@ -61,6 +61,12 @@
         "type": "number",
         "minimum": 0,
         "description": "Optional depth below the surface. Leave unset if unknown. For a transducer two feet deep, enter 0.6096."
+      },
+      "historyPressureSource": {
+        "title": "History pressure source",
+        "type": "string",
+        "default": "",
+        "description": "Exact Signal K source ID for the chart. Blank locks to the first valid local pressure source and retains it across restarts. Independent of forecast inputs."
       }
     },
     "$comment": "Modified by SCarns for independent Ship's Barometer settings; see NOTICE and CHANGELOG.md."
